@@ -46,13 +46,11 @@ def utf_8_de_en(CLI_utf8_input=None):    # UTF-8编/解码
     if utf_8_decode_encode == "encode":
         utf_8_out = user_input.encode("utf-8")
     elif utf_8_decode_encode == "decode":
-        utf_8_decode_swap = user_input[1::]
+        utf_8_decode_swap = user_input[2:-2] # 输入格式 推荐，但是最好写个函数校验一下 b’\xe4\xbd\xa0\xe5\xa5\xyd’
         # print(utf_8_decode_swap)
-        utf_8_decode_swap = codecs.escape_decode(utf_8_decode_swap, "hex-escape")    # tuple
-        # print(utf_8_decode_swap)
-        utf_8_out = utf_8_decode_swap[0]    # bytes
-        # print(type(utf_8_out))
-        utf_8_out = utf_8_out.decode("utf-8")    # 终于结束了
+        utf_8_decode_swap = utf_8_decode_swap.encode("unicode_escape").decode("utf-8").replace("\\\\x", "%") # 转为url编码形式
+        from urllib import parse
+        utf_8_out = parse.unquote(utf_8_decode_swap) # 终于结束了
     # pyperclip.copy(utf_8_out)
     print(utf_8_out)
 # utf_8_de_en()
