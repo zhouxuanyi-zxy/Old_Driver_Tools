@@ -1,13 +1,15 @@
 # Old-Driver-Tools Python Edition
 # Author: zhouxuanyi-zxy
 # Licence: MIT Licence
-# Version: v0.4b
+# Version: v0.5b1
 # Language: Python
 # 2023.1.3-v0.1b
 # 2023.1.23-v0.2b
 # 2023.1.23-v0.3b
 # 2023.1.31-v0.4b
-
+# 2023.2.1-v0.5b1
+VERSION = "v0.5b1"
+# 在0.4b后更改为正确的版本命名方式
 import base64
 import os
 import sys
@@ -28,6 +30,7 @@ from gmssl import sm2
 base64_decode_encode = "" # base64模式判断
 utf_8_decode_encode = "" # UTF-8模式判断
 sm2_decrypt_encrypt = "encrypt"
+use_cli = "1"    # 给我调试新功能时用的 1=true 0=false
 user_input = ""    # 用户输入
 
 def base64_de_en(CLI_base64_input=None):    # base64编/解码具体实现
@@ -85,26 +88,45 @@ def sm2_de_en():    # 初步框架,无法使用
     print(sm2_output)
 
 # sm2_de_en()
-if __name__ == "__main__":
+if __name__ == "__main__" and use_cli == "1":
     CLI_input = ""
     try:
         if sys.argv[1] == "base64":
             if sys.argv[2] == "decode":
                 CLI_input = sys.argv[3]
                 base64_decode_encode = "decode"
-            if sys.argv[2] == "encode":
+            elif sys.argv[2] == "encode":
                 CLI_input = sys.argv[3]
                 base64_decode_encode = "encode"
+            else:
+                raise IndexError()
             base64_de_en(CLI_input)
         elif sys.argv[1] == "utf-8":
             if sys.argv[2] == "decode":
                 CLI_input = sys.argv[3]
                 utf_8_decode_encode = "decode"
-            if sys.argv[2] == "encode":
+            elif sys.argv[2] == "encode":
                 CLI_input = sys.argv[3]
                 utf_8_decode_encode = "encode"
+            else:
+                raise IndexError()
             utf_8_de_en(CLI_input)
+        elif sys.argv[1] == "help" or sys.argv[1] == "h":
+            # print("\033[32m \033[0m")    模板
+            print("\033[32mOld-Driver-Tool Python Edition\033[0m")
+            print("\033[32mVersion:\033[0m",VERSION)
+            print("\033[32mby zhouxuanyi-zxy\033[0m")
+            print("用法/Usage:")
+            print("python Old-Driver-Tools-CLI.py [base64/utf-8] [decode/encode] [内容]")
+            print("帮助/help:")
+            print("python Old-Driver-Tools-CLI.py h")
+        else:
+            raise IndexError()
     except IndexError:
-        print('''用法: 
-        python Old-Driver-Tools-CLI.py [base64/utf-8] [decode/encode] [内容]
+        print('''用法/Usage:
+            python Old-Driver-Tools-CLI.py [base64/utf-8] [decode/encode] [内容]
             ''')
+        print('''帮助/help:
+            python Old-Driver-Tools-CLI.py h
+        ''')
+        
