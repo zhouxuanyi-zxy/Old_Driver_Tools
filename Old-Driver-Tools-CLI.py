@@ -8,7 +8,8 @@
 # 2023.1.23-v0.3b
 # 2023.1.31-v0.4b
 # 2023.2.1-v0.5b1
-VERSION = "v0.5b1"
+# 2023.2.25-v0.5b2
+VERSION = "v0.5b2"
 # 在0.4b后更改为正确的版本命名方式
 import base64
 import os
@@ -22,8 +23,8 @@ except ModuleNotFoundError:    # 如果没有此包,则使用国内pip源安装
     os.system("pip install -i https://pypi.tuna.tsinghua.edu.cn/simple pyperclip")
     os.system("pip install -i https://pypi.tuna.tsinghua.edu.cn/simple gmssl")
     os.system("pip install -i https://pypi.tuna.tsinghua.edu.cn/simple chardet")
-    os.system("python Old-Driver-Tools-CLI.py")    # 自动重启程序
-    sys.exit()
+    os.system("python {}".format(sys.argv[0]))    # 自动重启程序
+    # sys.exit()
 from gmssl import sm2
 
 # 导入结束,程序开始
@@ -37,7 +38,7 @@ def base64_de_en(CLI_base64_input=None):    # base64编/解码具体实现
     global user_input,base64_decode_encode
     user_input = CLI_base64_input
     user_input = bytes(user_input,encoding="utf-8")    # 转换为bytes类型
-    print(user_input)
+    # print(user_input)
     try:
         if base64_decode_encode == "encode":    # 编码
             base64_out = base64.b64encode(user_input)    # 编码
@@ -113,6 +114,14 @@ if __name__ == "__main__" and use_cli == "1":
             utf_8_de_en(CLI_input)
         elif sys.argv[1] == "help" or sys.argv[1] == "h":
             # print("\033[32m \033[0m")    模板
+            print('''
+ _____ _     _       ______    _      _                     _____           _ 
+|  _  | |   | |      |  _  \  | |    (_)                   |_   _|         | |
+| | | | | __| |______| | | |__| |_ __ ___   _____ _ __ ______| | ___   ___ | |
+| | | | |/ _` |______| | | / _` | '__| \ \ / / _ \ '__|______| |/ _ \ / _ \| |
+\ \_/ / | (_| |      | |/ / (_| | |  | |\ V /  __/ |         | | (_) | (_) | |
+ \___/|_|\__,_|      |___/ \__,_|_|  |_| \_/ \___|_|         \_/\___/ \___/|_|
+''')
             print("\033[32mOld-Driver-Tool Python Edition\033[0m")
             print("\033[32mVersion:\033[0m",VERSION)
             print("\033[32mby zhouxuanyi-zxy\033[0m")
