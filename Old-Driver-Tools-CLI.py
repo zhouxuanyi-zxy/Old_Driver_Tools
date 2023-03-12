@@ -9,7 +9,9 @@
 # 2023.1.31-v0.4b
 # 2023.2.1-v0.5b1
 # 2023.2.25-v0.5b2
-VERSION = "v0.5b2"
+# 2023.2.26-v0.6b1
+# 2023.3.3(12)-v0.6b2
+VERSION = "v0.6b2"
 # 在0.4b后更改为正确的版本命名方式
 import base64
 import os
@@ -19,10 +21,14 @@ try:
     import pyperclip    # 复制到剪切板
     import gmssl    
     import chardet
+    import qrcode
+    import cv2
 except ModuleNotFoundError:    # 如果没有此包,则使用国内pip源安装
     os.system("pip install -i https://pypi.tuna.tsinghua.edu.cn/simple pyperclip")
     os.system("pip install -i https://pypi.tuna.tsinghua.edu.cn/simple gmssl")
     os.system("pip install -i https://pypi.tuna.tsinghua.edu.cn/simple chardet")
+    os.system("pip install -i https://pypi.tuna.tsinghua.edu.cn/simple qrcode")
+    os.system("pip install -i https://pypi.tuna.tsinghua.edu.cn/simple opencv-python")
     os.system("python {}".format(sys.argv[0]))    # 自动重启程序
     # sys.exit()
 from gmssl import sm2
@@ -30,7 +36,8 @@ from gmssl import sm2
 # 导入结束,程序开始
 base64_decode_encode = "" # base64模式判断
 utf_8_decode_encode = "" # UTF-8模式判断
-sm2_decrypt_encrypt = "encrypt"
+sm2_decrypt_encrypt = "encrypt" # sm2模式判断
+qrcode_decode_encode = "decode" # qrcode 模式判断
 use_cli = "1"    # 给我调试新功能时用的 1=true 0=false
 user_input = ""    # 用户输入
 
@@ -73,7 +80,7 @@ def utf_8_de_en(CLI_utf8_input=None):    # UTF-8编/解码
 def sm2_de_en():    # 初步框架,无法使用
     global sm2_decrypt_encrypt,user_input
     # user_input = input()
-    user_input = b'123'
+    user_input = ""
     # user_input = bytes(user_input,encoding="utf-8")
     print(user_input)
     sm2_output = ""
@@ -83,11 +90,26 @@ def sm2_de_en():    # 初步框架,无法使用
     private_key = 'B9C9A6E04E9C91F7BA880429273747D7EF5DDEB0BB2FF6317EB00BEF331A83081A6994B8993F3F5D6EADDDB81872266C87C018FB4162F5AF347B483E24620207'    # 私钥
     sm2_crypt = sm2.CryptSM2(public_key=pubric_key,private_key=private_key)
     if sm2_decrypt_encrypt == "encrypt":
-        sm2_output = sm2_crypt.encrypt(user_input.encode("utf-8"))
+        sm2_output = sm2_crypt.encrypt(user_input).encode("utf-8")
     elif sm2_decrypt_encrypt == "decrypt":
         sm2_output = sm2_crypt.decrypt(user_input).decode("utf-8")
     print(sm2_output)
 
+def qrcode_de_en(qrcode_input=None):
+    global qrcode_decode_encode,user_input
+    # qrcode_decode_encode = "decode"
+    user_input = qrcode_input
+    if qrcode_decode_encode == "encode":
+        # user_input = "https://baidu.com"
+        qrcode_out = qrcode.make(user_input)
+        qrcode_out.save("qrcode.png")
+    elif qrcode_decode_encode == "decode":
+        qrcode_out = cv2.QRCodeDetector()
+        # d = qrcode_out.detectAndDecode(cv2.imread('{}'.format.user_input))
+        d = qrcode_out.detectAndDecode(cv2.imread('{}'.format(user_input)))
+        print(d[0])
+
+# qrcode_de_en("qrcode.png")
 # sm2_de_en()
 if __name__ == "__main__" and use_cli == "1":
     CLI_input = ""
@@ -112,6 +134,16 @@ if __name__ == "__main__" and use_cli == "1":
             else:
                 raise IndexError()
             utf_8_de_en(CLI_input)
+        elif sys.argv[1] == "qrcode":
+            if sys.argv[2] == "decode":
+                CLI_input = sys.argv[3]
+                qrcode_decode_encode = "decode"
+            elif sys.argv[2] == "encode":
+                CLI_input = sys.argv[3]
+                qrcode_decode_encode = "encode"
+            else:
+                raise IndexError()
+            qrcode_de_en(CLI_input)
         elif sys.argv[1] == "help" or sys.argv[1] == "h":
             # print("\033[32m \033[0m")    模板
             print('''
@@ -126,14 +158,14 @@ if __name__ == "__main__" and use_cli == "1":
             print("\033[32mVersion:\033[0m",VERSION)
             print("\033[32mby zhouxuanyi-zxy\033[0m")
             print("用法/Usage:")
-            print("python Old-Driver-Tools-CLI.py [base64/utf-8] [decode/encode] [内容]")
+            print("python Old-Driver-Tools-CLI.py [base64/utf-8/qrcode] [decode/encode] [内容]")
             print("帮助/help:")
             print("python Old-Driver-Tools-CLI.py h")
         else:
             raise IndexError()
     except IndexError:
         print('''用法/Usage:
-            python Old-Driver-Tools-CLI.py [base64/utf-8] [decode/encode] [内容]
+            python Old-Driver-Tools-CLI.py [base64/utf-8/qrcode] [decode/encode] [内容]
             ''')
         print('''帮助/help:
             python Old-Driver-Tools-CLI.py h
